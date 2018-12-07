@@ -11,19 +11,20 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    // forward/reverse [INPUTFILE] [OUTPUTFILE]
+    // declare vars
     InputImage imageObj(argv[2]);
     int width, height;
-    Complex *image;
+    Complex *image = nullptr;
 
+    // values from input file
     width = imageObj.get_width();
     height = imageObj.get_height();
     image = imageObj.get_image_data();
 
     // Complex ans(0, 0);
 
+    // start mpi
     int numtasks, rank, rc;
-
     rc = MPI_Init(&argc, &argv);
     if (rc != MPI_SUCCESS)
     {
@@ -33,6 +34,29 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
+
+    int row;
+    for (row = 0; row < height; ++row)
+    {
+        std::cout << "row: " << row << std::endl;
+
+
+
+
+    }
+
+    // synchronize at end of horizontal FFT
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    int column;
+    for (column = 0; column < height; ++column)
+    {
+        std::cout << "column: " << row << std::endl;
+
+
+
+
+    }
 
     std::cout << "Rank " << rank << " exiting normally" << std::endl;
     MPI_Finalize();
