@@ -1,8 +1,11 @@
 building project:
 
-mkdir build 
+mkdir build
+
 cd build
+
 cmake ..
+
 make
 
 ./p31 forward/reverse [INPUTFILE] [OUTPUTFILE]
