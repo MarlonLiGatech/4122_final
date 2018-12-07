@@ -1,6 +1,7 @@
 building project:
 
-mkdir build 
+mkdir build
+
 cd build
 cmake ..
 make
