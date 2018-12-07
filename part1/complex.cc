@@ -15,27 +15,39 @@ Complex::Complex(float r) : real(r), imag(0.0f) {}
 Complex::Complex(float r, float i) : real(r), imag(i) {}
 
 Complex Complex::operator+(const Complex &b) const {
-
+	Complex ans;
+    ans.real = real + b.real;
+    ans.imag = imag + b.imag;
+    return ans;
 }
 
 Complex Complex::operator-(const Complex &b) const {
-
+    Complex ans;
+    ans.real = real - b.real;
+    ans.imag = imag - b.imag;
+    return ans;
 }
 
 Complex Complex::operator*(const Complex &b) const {
-
+    Complex ans;
+    ans.real = (real * b.real) - (imag * b.imag);
+    ans.imag = (real * b.imag) + (imag * b.real);
+    return ans;
 }
 
-Complex Complex::mag() const {
-
+float Complex::mag() const {
+    return sqrt(real * real + imag * imag);
 }
 
-Complex Complex::angle() const {
-
+float Complex::angle() const {
+    return atan(imag / real);
 }
 
 Complex Complex::conj() const {
-
+	Complex conj;
+	conj.real = real;
+	conj.imag = - imag;
+	return conj;
 }
 
 std::ostream& operator<< (std::ostream& os, const Complex& rhs) {

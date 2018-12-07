@@ -15,8 +15,8 @@ public:
     Complex operator-(const Complex& b) const;
     Complex operator*(const Complex& b) const;
 
-    Complex mag() const;
-    Complex angle() const;
+    float mag() const;
+    float angle() const;
     Complex conj() const;
 
     float real;
