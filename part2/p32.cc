@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
 
     //output buffer of FFT
-    Complex output[length];
+    // Complex output[length];
 
     int m, row;
     for (m = 0; m < length/numtasks; ++m)
@@ -52,23 +52,23 @@ int main(int argc, char **argv)
         std::cout << "row: " << row << std::endl;
 
         //fft
-        fft(image + row * length, output, length);
+        fft(image + row * length, length);
         for (int i = 0; i < length; ++i) {
             // std::cout << image[i + row * length] << ' ';
-            std::cout << output[i] << ' ';
+            // std::cout << output[i] << ' ';
         }
-        std::cout << std::endl;
+        // std::cout << std::endl;
     }
 
-    // synchronize at end of horizontal FFT
-    MPI_Barrier(MPI_COMM_WORLD);
+    // // synchronize at end of horizontal FFT
+    // MPI_Barrier(MPI_COMM_WORLD);
 
-    int n, column;
-    for (n = 0; n < length/numtasks; ++n)
-    {
-        column = rank + n * numtasks;
-        //std::cout << "column: " << row << std::endl;
-    }
+    // int n, column;
+    // for (n = 0; n < length/numtasks; ++n)
+    // {
+    //     column = rank + n * numtasks;
+    //     //std::cout << "column: " << row << std::endl;
+    // }
 
     std::cout << "Rank " << rank << " exiting normally" << std::endl;
     MPI_Finalize();
