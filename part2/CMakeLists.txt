@@ -14,6 +14,8 @@ set(SOURCE_FILES
     input_image.cc
     input_image.h
     p32.cc
+    fft.cc
+    fft.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
