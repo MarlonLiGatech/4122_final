@@ -1,16 +1,19 @@
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <cstdlib>
 using namespace std;
 
 void writeFile()
 {
     ofstream myfile;
-    myfile.open("Tower16.txt");
-    myfile << "16 16 \n";
-    for (int i = 0; i < 256; ++i)
+    int size = 2048;    //change this to create different sized tests
+    myfile.open("Tower" + to_string(size) + ".txt");
+    myfile << size << ' ' << size << endl;
+    for (int i = 0; i < size * size; ++i)
     {
-        myfile << i << ' ';
-        if ((i + 1) % 16 == 0) {
+        myfile << rand() % 255 << ' ';
+        if ((i + 1) % size == 0) {
             myfile << endl;
         }
     }
