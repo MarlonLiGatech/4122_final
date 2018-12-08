@@ -1,0 +1,3 @@
+scp -r FinalProject mli396@coc-ice.pace.gatech.edu:ECE4122
+ssh -t -X mli396@coc-ice.pace.gatech.edu "cd ECE4122/FinalProject/build ; bash"
+qsub final.pbs

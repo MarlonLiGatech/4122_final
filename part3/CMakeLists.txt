@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.9)
 # find_package(CUDA QUIET REQUIRED)
 
 # CUDA_ADD_EXECUTABLE(
-# 	heat2D3D
-# 	src/main.cu
+# 	p33
+#   p33.cu
+# 	complex.cu
+#   complex.h
+#   input_image.cc
+#   input_image.h
 # 	)
