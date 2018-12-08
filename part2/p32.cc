@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <mpi.h>
 #include <cstring>
 #include <cstddef>
@@ -57,6 +58,7 @@ int main(int argc, char **argv)
 
     printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
 
+    //calculate row fft
     Complex *sendBuffer = (Complex *)malloc(sizeof(Complex) * length);
     int m, row;
     for (m = 0; m < length / numtasks; ++m)
@@ -72,33 +74,44 @@ int main(int argc, char **argv)
     // synchronize at end of horizontal FFT
     MPI_Barrier(MPI_COMM_WORLD);
 
-    int n, column;
+    // transpose for columns
+    for (int i = 0; i < length; ++i)
+        for (int j = i + 1; j < length; ++j)
+            std::swap(image[length * i + j], image[length * j + i]);
 
-    // for (int i = 0; i < totalLength; ++i)
-    // {
-    //     std::cout << image[i] << ' ';
-    //     if ((i + 1) == 16)
-    //         std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
-    // }
+    // fft of columns
+    int n, column;
     for (n = 0; n < length / numtasks; ++n)
     {
         column = rank + n * numtasks;
         std::cout << "column: " << row << std::endl;
 
-        // std::memcpy(sendBuffer, image + row * length, length * sizeof(Complex));
-
-        // for (int i = 0; i < length; ++i)
-        // {
-        //     buffer[i] = image[i * length];
-        // }
-        // for (int i = 0; i < length; ++i)
-        //     std::cout << buffer[i] << ' ';
-        // std::cout << std::endl;
+        std::memcpy(sendBuffer, image + column * length, sizeof(Complex) * length);
+        fft(sendBuffer, length);
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Gather(sendBuffer, length, MY_MPI_COMPLEX, image + n * numtasks * length, length, MY_MPI_COMPLEX, 0, MPI_COMM_WORLD);
     }
 
+    // send everything to rank 0 and print
+    if (rank == 0)
+    {
+        for (int i = 0; i < length; ++i)
+            for (int j = i + 1; j < length; ++j)
+                std::swap(image[length * i + j], image[length * j + i]);
+
+        std::ofstream outFile;
+        outFile.open(argv[3]);
+        
+        for (int i = 0; i < totalLength; ++i)
+        {
+            outFile << image[i] << ' ';
+            if ((i + 1) == 16)
+                outFile << std::endl;
+        }
+        outFile.close();
+    }
     std::cout << "Rank " << rank << " exiting normally" << std::endl;
+    free(sendBuffer);
     MPI_Finalize();
     return 0;
 }
