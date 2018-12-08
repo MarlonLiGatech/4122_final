@@ -2,12 +2,9 @@
 #include <fstream>
 #include <mpi.h>
 #include <cstring>
-#include <cstddef>
-// #include <cmath>
 #include "complex.h"
 #include "input_image.h"
 #include "fft.h"
-#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -50,13 +47,13 @@ int main(int argc, char **argv)
     MPI_Type_create_resized(MPI_COMPLEX_TEMP, lowerBound, extent, &MY_MPI_COMPLEX);
     MPI_Type_commit(&MY_MPI_COMPLEX);
 
-    if (rank == 0) //debug
-    {
-        std::cout << "Image length: " << length;
-        std::cout << ", total length: " << totalLength << std::endl;
-    }
+    // if (rank == 0) //debug
+    // {
+    //     std::cout << "Image length: " << length;
+    //     std::cout << ", total length: " << totalLength << std::endl;
+    // }
 
-    printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
+    // printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
 
     //calculate row fft
     Complex *sendBuffer = (Complex *)malloc(sizeof(Complex) * length);
@@ -64,7 +61,7 @@ int main(int argc, char **argv)
     for (m = 0; m < length / numtasks; ++m)
     {
         row = rank + m * numtasks;
-        std::cout << "row: " << row << std::endl;
+        // std::cout << "row: " << row << std::endl;
         std::memcpy(sendBuffer, image + row * length, length * sizeof(Complex));
         fft(sendBuffer, length);
         MPI_Barrier(MPI_COMM_WORLD);
@@ -84,7 +81,7 @@ int main(int argc, char **argv)
     for (n = 0; n < length / numtasks; ++n)
     {
         column = rank + n * numtasks;
-        std::cout << "column: " << row << std::endl;
+        // std::cout << "column: " << row << std::endl;
 
         std::memcpy(sendBuffer, image + column * length, sizeof(Complex) * length);
         fft(sendBuffer, length);
@@ -101,7 +98,7 @@ int main(int argc, char **argv)
 
         std::ofstream outFile;
         outFile.open(argv[3]);
-        
+
         for (int i = 0; i < totalLength; ++i)
         {
             outFile << image[i] << ' ';
@@ -110,7 +107,7 @@ int main(int argc, char **argv)
         }
         outFile.close();
     }
-    std::cout << "Rank " << rank << " exiting normally" << std::endl;
+    // std::cout << "Rank " << rank << " exiting normally" << std::endl;
     free(sendBuffer);
     MPI_Finalize();
     return 0;
