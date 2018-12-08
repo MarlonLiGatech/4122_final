@@ -1,9 +1,12 @@
 #include <iostream>
 #include <mpi.h>
+#include <cstring>
+#include <cstddef>
 // #include <cmath>
 #include "complex.h"
 #include "input_image.h"
 #include "fft.h"
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -34,6 +37,18 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+    // create new MPI type for Complex
+    int count = 2;
+    const int arrBlockLength[] = {1, 1};
+    const MPI_Aint arrDisplacement[] = {offsetof(Complex, real), offsetof(Complex, imag)};
+    const MPI_Datatype arrTypes[] = {MPI_FLOAT, MPI_FLOAT};
+    MPI_Datatype MPI_COMPLEX_TEMP, MY_MPI_COMPLEX;
+    MPI_Aint lowerBound, extent;
+    MPI_Type_create_struct(count, arrBlockLength, arrDisplacement, arrTypes, &MPI_COMPLEX_TEMP);
+    MPI_Type_get_extent(MPI_COMPLEX_TEMP, &lowerBound, &extent);
+    MPI_Type_create_resized(MPI_COMPLEX_TEMP, lowerBound, extent, &MY_MPI_COMPLEX);
+    MPI_Type_commit(&MY_MPI_COMPLEX);
+
     if (rank == 0) //debug
     {
         std::cout << "Image length: " << length;
@@ -42,33 +57,46 @@ int main(int argc, char **argv)
 
     printf("Number of tasks: %d My rank: %d\n", numtasks, rank);
 
+    Complex *sendBuffer = (Complex *)malloc(sizeof(Complex) * length);
     int m, row;
     for (m = 0; m < length / numtasks; ++m)
     {
         row = rank + m * numtasks;
         std::cout << "row: " << row << std::endl;
-
-        fft(image + row * length, length);
-        for (int i = 0; i < length; ++i)
-            std::cout << image[i + row * length] << ' ';
-        std::cout << std::endl;
+        std::memcpy(sendBuffer, image + row * length, length * sizeof(Complex));
+        fft(sendBuffer, length);
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Allgather(sendBuffer, length, MY_MPI_COMPLEX, image + m * numtasks * length, length, MY_MPI_COMPLEX, MPI_COMM_WORLD);
     }
 
     // synchronize at end of horizontal FFT
-    
     MPI_Barrier(MPI_COMM_WORLD);
-    std::cout << "rank " << rank << " at barrier" << std::endl;
 
     int n, column;
+
+    // for (int i = 0; i < totalLength; ++i)
+    // {
+    //     std::cout << image[i] << ' ';
+    //     if ((i + 1) == 16)
+    //         std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
+    // }
     for (n = 0; n < length / numtasks; ++n)
     {
         column = rank + n * numtasks;
         std::cout << "column: " << row << std::endl;
+
+        // std::memcpy(sendBuffer, image + row * length, length * sizeof(Complex));
+
+        // for (int i = 0; i < length; ++i)
+        // {
+        //     buffer[i] = image[i * length];
+        // }
+        // for (int i = 0; i < length; ++i)
+        //     std::cout << buffer[i] << ' ';
+        // std::cout << std::endl;
     }
-    // fft(image + row * length, length);
-    // for (int i = 0; i < length; ++i)
-    //     std::cout << image[i + row * length] << ' ';
-    // std::cout << std::endl;
 
     std::cout << "Rank " << rank << " exiting normally" << std::endl;
     MPI_Finalize();
