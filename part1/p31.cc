@@ -4,23 +4,23 @@
 #include "complex.h"
 #include "input_image.h"
 
-
 // Play with this to get best peformance (should be a power of 2)
 #define NUM_THREADS 8
 const float PI = 3.14159265358979f;
 
 
 // Thread function declarations (s_ prefix means starting)
+// Computes the row dft and col dft respectively
 void row_dft(Complex* data, Complex* dft_data, int w, int s_h, int rows_per_thread);
 void col_dft(Complex* data, Complex* dft_data, int s_w, int h, int cols_per_thread);
 
 
 int main(int argc, char **argv) {
-    // file names, foward/reverse
+    // Get the command line arguments
     char *in_file, *out_file;
     in_file = argv[2];
     out_file = argv[3];
-    // If the command line asks for anything other than a foward dft, reject that junk
+    // If the command line asks for anything other than a foward dft, return error
     if (argc != 4) {
         printf("Incorrect number of arguments\n");
         return -1;
@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
     int h = img.get_height();
     Complex* data = img.get_image_data();
     Complex* dft_data = new Complex[w*h];
-
 
     // Array of threads
     std::thread thread_arr[NUM_THREADS];
@@ -63,11 +62,9 @@ int main(int argc, char **argv) {
         thread_arr[i].join();
     }
 
-
-    // save the file using given function
+    // save the data save_image_data function
     img.save_image_data(out_file, data, w, h);
-    // I wish to edit this
-    return 0;
+    // I wish to edit this    return 0;
 }
 
     /**************************************************************************
@@ -78,7 +75,6 @@ int main(int argc, char **argv) {
      * How to compute 2D fourier transform
        - Compute 1D transform for all rows
        - Compute 1D transfrom fro all columns (using inputs from first step)
-       - Enjoy the glorius dft that you have performed
     ***************************************************************************/
 
 // Thread function definitions
