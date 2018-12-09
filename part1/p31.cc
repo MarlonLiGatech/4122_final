@@ -1,11 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <string.h>
 #include <thread>
-#include <stdlib.h>
-#include "input_image.h"
-#include "complex.h"
 #include <cmath>
+#include <string.h>
+#include "complex.h"
+#include "input_image.h"
 
 
 // Play with this to get best peformance (should be a power of 2)
@@ -24,8 +21,12 @@ int main(int argc, char **argv) {
     in_file = argv[2];
     out_file = argv[3];
     // If the command line asks for anything other than a foward dft, reject that junk
+    if (argc != 4) {
+        printf("Incorrect number of arguments\n");
+        return -1;
+    }
     if (strcmp(argv[1], "foward") != 0) {
-        std::cout << "We don't do reverse dfts here";
+         printf("We don't do reverse dfts here");
         return -1;
     }
 
@@ -61,7 +62,6 @@ int main(int argc, char **argv) {
     for (int i = 0; i < NUM_THREADS; ++i) {
         thread_arr[i].join();
     }
-
 
 
     // save the file using given function
