@@ -64,7 +64,8 @@ int main(int argc, char **argv) {
 
     // save the data save_image_data function
     img.save_image_data(out_file, data, w, h);
-    // I wish to edit this    return 0;
+    
+    return 0;
 }
 
     /**************************************************************************
